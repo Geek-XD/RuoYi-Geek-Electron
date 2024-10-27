@@ -1,14 +1,14 @@
 import fs from 'fs'
 import { BrowserWindow, net } from 'electron'
 import path from 'path'
-
 /**
  * 动态加载JavaScript代码
- * 
- * 该函数根据提供的数据参数，从不同来源加载JavaScript代码它可以处理文件路径和URL，分别使用文件系统和网络请求来获取JavaScript代码
- * 
- * @param data JavaScript代码的来源，可以是文件路径（以'file://'开头），或URL（以'http://'或'https://'开头），也可以是JavaScript代码字符串
- * @returns 返回一个Promise，解析为加载的JavaScript代码字符串如果加载失败，Promise将被拒绝
+ *
+ * 该函数根据提供的数据路径，异步加载并返回JavaScript代码字符串
+ * 它支持从本地文件系统和远程URL加载代码
+ *
+ * @param data JavaScript代码的路径可以是本地路径或远程URL
+ * @returns 返回一个Promise，解析为JavaScript代码字符串
  */
 export const getJavaScript = (data: string) => {
   return new Promise<string>((resolve, reject) => {
@@ -35,13 +35,12 @@ export const getJavaScript = (data: string) => {
 
 /**
  * 在指定的浏览器窗口或当前环境下执行JavaScript代码
- * 
- * 此函数接受一个BrowserWindow对象和一段脚本作为参数，
- * 它首先获取经过处理的真实脚本，然后在给定的BrowserWindow中执行这段脚本
- * 如果没有指定BrowserWindow对象，它将在当前环境下执行脚本
- * 
- * @param win BrowserWindow对象，用于执行脚本的环境如果为null，则在当前环境下执行
- * @param script 要执行的JavaScript代码字符串
+ *
+ * 此函数用于在 Electron 的 BrowserWindow 中执行 JavaScript 代码如果未指定窗口，或窗口为 null，
+ * 则在当前环境下执行代码这通常用于自动化任务或与页面脚本交互
+ *
+ * @param win 浏览器窗口对象，用于指定执行脚本的环境如果为 null，则在当前环境下执行
+ * @param script 要执行的 JavaScript 代码字符串
  */
 export const executeJavaScript = async (win: BrowserWindow | null, script: string) => {
   const realScript = await getJavaScript(script)
