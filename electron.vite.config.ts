@@ -16,8 +16,16 @@ export default defineConfig({
     plugins: [externalizeDepsPlugin()],
     resolve: {
       alias: {
+        '@main': resolve('src/main'),
         '@preload': resolve('src/preload'),
         '@resources': resolve('resources')
+      }
+    },
+    build: {
+      rollupOptions: {
+        input: {
+          index: resolve(__dirname, 'src/preload/index.ts')
+        }
       }
     }
   },

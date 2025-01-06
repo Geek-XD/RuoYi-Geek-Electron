@@ -1,6 +1,6 @@
-class PuppeteerNode {
+export class PuppeteerNode {
   constructor(
-    private xpath: string,
+    public xpath: string,
     public root: Document = document
   ) {}
   get nodes() {
@@ -11,6 +11,11 @@ class PuppeteerNode {
       xnodes.push(xres)
     }
     return xnodes
+  }
+
+  get node() {
+    const xresult = this.root.evaluate(this.xpath, this.root, null, XPathResult.ANY_TYPE, null)
+    return xresult.iterateNext()
   }
   get text() {
     const xresult = this.root.evaluate(
@@ -25,8 +30,18 @@ class PuppeteerNode {
   $x(xpath: string) {
     return new PuppeteerNode(this.xpath + xpath, this.root)
   }
+
+  $nodes() {
+    const xresult = this.root.evaluate(this.xpath, this.root, null, XPathResult.ANY_TYPE, null)
+    let xnodes = new Array<PuppeteerNode>()
+    let index: number = 0
+    while (xresult.iterateNext()) {
+      xnodes.push(new PuppeteerNode(`(${this.xpath})[${++index}]`, this.root))
+    }
+    return xnodes
+  }
 }
-const Puppeteer = {
+export const Puppeteer = {
   input(element: HTMLInputElement, text: string) {
     element.focus()
     element.setSelectionRange(element.value.length, element.value.length)
@@ -81,8 +96,8 @@ const Puppeteer = {
       bubbles: true,
       cancelable: true,
       view: window,
-      buttons: 1, 	// 1 表示左键按下。    2 表示中键（滚轮按钮）按下。     4 表示右键按下。
-      button: 0 	// 0 表示左键。        1 表示中键（滚轮按钮）。        2 表示右键。
+      buttons: 1, // 1 表示左键按下。    2 表示中键（滚轮按钮）按下。     4 表示右键按下。
+      button: 0 // 0 表示左键。        1 表示中键（滚轮按钮）。        2 表示右键。
     }
   ) {
     element.focus()
@@ -115,39 +130,24 @@ const Puppeteer = {
     return new PuppeteerNode(xpath, DOCUMENT)
   }
 }
+export class Performer {
+  private steps: (() => Promise<any>)[] = []
 
-// 操作
-export class Operation {
-  constructor(
-    public xpath: string,
-    public index: number | null,
-    public operation: Exclude<keyof typeof Puppeteer, '$x'>,
-    public args: string | undefined | File | FileList
-  ) {}
-}
+  public time = 100
+  constructor() {}
 
-export class Controller {
-  public operations: Operation[] = []
-  constructor(public root: Document = document) {}
-  push(operation: Operation) {
-    this.operations.push(operation)
-    return this
+  public sleep(time: number) {
+    this.steps.push(() => new Promise((resolve) => setTimeout(resolve, time)))
   }
 
-  run() {
-    for (let operation of this.operations) {
-      const puppeteerNode = new PuppeteerNode(operation.xpath, this.root)
-      const method = Puppeteer[operation.operation]
-      if (operation.index !== null) {
-        const node = puppeteerNode.nodes[operation.index]
-        method(node as any, operation.args as any)
-      } else {
-        for (let node of puppeteerNode.nodes) {
-          method(node as any, operation.args as any)
-        }
-      }
+  public step(fun: () => Promise<any>, time: number = this.time) {
+    this.steps.push(fun)
+    if (time) this.sleep(time)
+    return this
+  }
+  public async run() {
+    for (let step of this.steps) {
+      await step()
     }
   }
 }
-
-export default Puppeteer
