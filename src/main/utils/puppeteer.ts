@@ -90,21 +90,19 @@ export const Puppeteer = {
     element.dispatchEvent(new Event('blur', { bubbles: true }))
   },
   // 模拟点击
-  click(
-    element: HTMLElement,
-    eventInitDict: MouseEventInit = {
+  click(element: HTMLElement, button: 'left' | 'right' | 'middle' = 'left') {
+    const eventInitDict = {
       bubbles: true,
       cancelable: true,
       view: window,
-      buttons: 1, // 1 表示左键按下。    2 表示中键（滚轮按钮）按下。     4 表示右键按下。
-      button: 0 // 0 表示左键。        1 表示中键（滚轮按钮）。        2 表示右键。
+      buttons: { left: 1, middle: 2, right: 4 }[button],
+      button: { left: 0, middle: 1, right: 2 }[button]
     }
-  ) {
     element.focus()
     element.dispatchEvent(new MouseEvent('click', eventInitDict))
   },
   // 文件上传
-  fileUpload(upload: HTMLInputElement, fileList: FileList) {
+  uploadFile(upload: HTMLInputElement, fileList: FileList | string) {
     if (!upload || upload.type !== 'file') {
       throw new Error('The provided element is not a valid file input element.')
     }
@@ -126,6 +124,7 @@ export const Puppeteer = {
       })
     )
   },
+
   $x(xpath: string, DOCUMENT: Document = document) {
     return new PuppeteerNode(xpath, DOCUMENT)
   }
