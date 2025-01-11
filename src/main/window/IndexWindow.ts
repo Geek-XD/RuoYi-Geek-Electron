@@ -34,7 +34,7 @@ export default class IndexWindow extends BaseWindow {
     if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
       context.webContents.openDevTools()
       context.loadURL(process.env['ELECTRON_RENDERER_URL'])
-      context.loadURL("http://localhost:80/")
+      // context.loadURL("http://localhost:80/")
     } else {
       context.loadFile(path.join(__dirname, '../renderer/index.html'))
     }
