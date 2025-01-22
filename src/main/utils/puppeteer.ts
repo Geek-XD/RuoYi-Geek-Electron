@@ -5,7 +5,7 @@ export class PuppeteerNode {
   ) {}
   get nodes() {
     const xresult = this.root.evaluate(this.xpath, this.root, null, XPathResult.ANY_TYPE, null)
-    let xnodes = new Array<Node>()
+    const xnodes = new Array<Node>()
     let xres: Node | null = null
     while ((xres = xresult.iterateNext())) {
       xnodes.push(xres)
@@ -33,7 +33,7 @@ export class PuppeteerNode {
 
   $nodes() {
     const xresult = this.root.evaluate(this.xpath, this.root, null, XPathResult.ANY_TYPE, null)
-    let xnodes = new Array<PuppeteerNode>()
+    const xnodes = new Array<PuppeteerNode>()
     let index: number = 0
     while (xresult.iterateNext()) {
       xnodes.push(new PuppeteerNode(`(${this.xpath})[${++index}]`, this.root))
@@ -45,7 +45,7 @@ export const Puppeteer = {
   input(element: HTMLInputElement, text: string) {
     element.focus()
     element.setSelectionRange(element.value.length, element.value.length)
-    for (let char of text) {
+    for (const char of text) {
       element.setRangeText(char, element.value.length, element.value.length, 'end')
       element.dispatchEvent(
         new KeyboardEvent('keydown', {
@@ -130,22 +130,21 @@ export const Puppeteer = {
   }
 }
 export class Performer {
-  private steps: (() => Promise<any>)[] = []
+  private steps: (() => Promise<void>)[] = []
 
   public time = 100
-  constructor() {}
 
   public sleep(time: number) {
     this.steps.push(() => new Promise((resolve) => setTimeout(resolve, time)))
   }
 
-  public step(fun: () => Promise<any>, time: number = this.time) {
+  public step(fun: () => Promise<void>, time: number = this.time) {
     this.steps.push(fun)
     if (time) this.sleep(time)
     return this
   }
   public async run() {
-    for (let step of this.steps) {
+    for (const step of this.steps) {
       await step()
     }
   }

@@ -9,10 +9,10 @@ function parseArgs(args: Args, options?: Parse) {
     if (Array.isArray(args)) {
         return args.join(' ')
     } else {
-        let argList: string[] = []
-        let beforKey: string = options ? options.beforKey || '' : ''
-        let joinKeyValue: string = options ? options.joinKeyValue || ' ' : ' '
-        for (let key in args) {
+        const argList: string[] = []
+        const beforKey: string = options ? options.beforKey || '' : ''
+        const joinKeyValue: string = options ? options.joinKeyValue || ' ' : ' '
+        for (const key in args) {
             if (args[key] === null || args[key] === undefined) {
                 argList.push(`${beforKey}${key}`)
             } else if (typeof args[key] !== 'object' && typeof args[key] !== 'function') {
@@ -23,13 +23,13 @@ function parseArgs(args: Args, options?: Parse) {
     }
 }
 export function runExec(cmd: string | string[], args?: Args, options?: (ObjectEncodingOptions & ExecOptions & Parse) | null, callback?: ((error: ExecException | null, stdout: string | Buffer, stderr: string | Buffer) => void)) {
-    let cmdStr = Array.isArray(cmd) ? cmd.join(' ') : cmd
+    const cmdStr = Array.isArray(cmd) ? cmd.join(' ') : cmd
     if (args) cmdStr + " " + parseArgs(args)
     return exec(cmdStr, options, callback)
 }
 
 export function runSpawn(cmd: string | string[], args?: Args, options: SpawnOptions & Parse = {}) {
-    let cmdStr = Array.isArray(cmd) ? cmd.join(' ') : cmd
+    const cmdStr = Array.isArray(cmd) ? cmd.join(' ') : cmd
     if (args) cmdStr + " " + parseArgs(args)
     return spawn(cmdStr, options)
 }

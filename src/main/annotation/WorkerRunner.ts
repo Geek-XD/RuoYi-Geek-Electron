@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/ban-types */
 import { Worker } from 'worker_threads';
 export default class WorkerRunner extends Worker {
     public messageHandle: { [key: string]: Function } = {}

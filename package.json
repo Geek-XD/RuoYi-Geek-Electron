@@ -3,8 +3,16 @@
   "version": "1.0.0",
   "description": "An Electron application with Vue and TypeScript",
   "main": "./out/main/index.js",
-  "author": "example.com",
-  "homepage": "https://electron-vite.org",
+  "author": "Geek-XD",
+  "license": "MIT",
+  "homepage": "https://gitee.com/geek-xd",
+  "repository": {
+    "type": "git",
+    "url": "https://gitee.com/geek-xd/ruoyi-geek-electron.git"
+  },
+  "engines": {
+    "node": "^18.0.0 || >=20.0.0"
+  },
   "scripts": {
     "format": "prettier --write .",
     "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts,.vue --fix",

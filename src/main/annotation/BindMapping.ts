@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
 
 // 构造函数

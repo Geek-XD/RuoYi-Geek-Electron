@@ -4,7 +4,9 @@ export default class BaseWindow {
     static browserWindow: BrowserWindow | null = null;
     static browserWindowOptions: Electron.BrowserWindowConstructorOptions = {};
 
-    static onCreate(_context: BrowserWindow) { }
+    static onCreate(_context: BrowserWindow) { 
+        console.warn("应该实现默认onCreate方法");
+    }
 
     static getWindow(): BrowserWindow {
         if (!this.browserWindow) {
