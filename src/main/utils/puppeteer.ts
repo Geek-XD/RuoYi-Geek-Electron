@@ -19,7 +19,7 @@ export class PuppeteerNode {
   }
   get text() {
     const xresult = this.root.evaluate(
-      this.xpath + '/text()',
+      this.xpath + '//text()',
       this.root,
       null,
       XPathResult.STRING_TYPE,
@@ -27,18 +27,20 @@ export class PuppeteerNode {
     )
     return xresult.stringValue
   }
-  $x(xpath: string) {
-    return new PuppeteerNode(this.xpath + xpath, this.root)
-  }
 
-  $nodes() {
-    const xresult = this.root.evaluate(this.xpath, this.root, null, XPathResult.ANY_TYPE, null)
+  get $nodes() {
+    const xpath = this.xpath + '/*'
+    const xresult = this.root.evaluate(xpath, this.root, null, XPathResult.ANY_TYPE, null)
     const xnodes = new Array<PuppeteerNode>()
     let index: number = 0
     while (xresult.iterateNext()) {
-      xnodes.push(new PuppeteerNode(`(${this.xpath})[${++index}]`, this.root))
+      xnodes.push(new PuppeteerNode(`(${xpath})[${++index}]`, this.root))
     }
     return xnodes
+  }
+
+  $x(xpath: string) {
+    return new PuppeteerNode(this.xpath + xpath, this.root)
   }
 }
 export const Puppeteer = {
@@ -126,7 +128,13 @@ export const Puppeteer = {
   },
 
   $x(xpath: string, DOCUMENT: Document = document) {
-    return new PuppeteerNode(xpath, DOCUMENT)
+    const xresult = DOCUMENT.evaluate(xpath, DOCUMENT, null, XPathResult.ANY_TYPE, null)
+    const xnodes = new Array<PuppeteerNode>()
+    let index: number = 0
+    while (xresult.iterateNext()) {
+      xnodes.push(new PuppeteerNode(`(${xpath})[${++index}]`, DOCUMENT))
+    }
+    return xnodes
   }
 }
 export class Performer {
