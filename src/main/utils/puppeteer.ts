@@ -40,7 +40,7 @@ export class PuppeteerNode {
   }
 
   $x(xpath: string) {
-    return new PuppeteerNode(this.xpath + xpath, this.root)
+    return Puppeteer.$x(this.xpath + xpath, this.root)
   }
 }
 export const Puppeteer = {
