@@ -126,7 +126,41 @@ export const Puppeteer = {
       })
     )
   },
-
+  // 模拟滚轮
+  scroll(element: HTMLElement, deltaY: number) {
+    const event = new WheelEvent('wheel', {
+      bubbles: true,
+      cancelable: true,
+      deltaY: deltaY
+    })
+    element.dispatchEvent(event)
+  },
+  // 模拟按键
+  keyAction(element: HTMLElement, key: string, type: 'keydown' | 'keyup' | 'keypress') {
+    const eventInitDict = {
+      bubbles: true,
+      cancelable: true,
+      key: key,
+      code: key === ' ' ? 'Space' : `Key${key.toUpperCase()}`,
+      keyCode: key.charCodeAt(0),
+      which: key.charCodeAt(0)
+    }
+    const arrow = {
+      UP: { keyCode: 38, code: 'ArrowUp' },
+      DOWN: { keyCode: 40, code: 'ArrowDown' },
+      LEFT: { keyCode: 37, code: 'ArrowLeft' },
+      RIGHT: { keyCode: 39, code: 'ArrowRight' }
+    }
+    const KEY = key.toUpperCase()
+    // 特殊处理方向键
+    if (KEY in arrow) {
+      eventInitDict.keyCode = arrow[KEY].keyCode
+      eventInitDict.which = eventInitDict.keyCode
+      eventInitDict.code = arrow[KEY].code
+      eventInitDict.key = arrow[KEY].code
+    }
+    element.dispatchEvent(new KeyboardEvent(type, eventInitDict))
+  },
   $x(xpath: string, DOCUMENT: Document = document) {
     const xresult = DOCUMENT.evaluate(xpath, DOCUMENT, null, XPathResult.ANY_TYPE, null)
     const xnodes = new Array<PuppeteerNode>()
