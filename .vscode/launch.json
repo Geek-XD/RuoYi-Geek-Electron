@@ -2,20 +2,6 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "DEV",
-      "type": "node",
-      "request": "launch",
-      "cwd": "${workspaceRoot}",
-      "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron-vite",
-      "windows": {
-        "runtimeExecutable": "${workspaceRoot}/node_modules/.bin/electron-vite.cmd"
-      },
-      "runtimeArgs": ["--sourcemap", "--watch"],
-      "env": {
-        "REMOTE_DEBUGGING_PORT": "http://127.0.0.1"
-      }
-    },
-    {
       "name": "Debug Main Process",
       "type": "node",
       "request": "launch",
@@ -26,8 +12,8 @@
       },
       "runtimeArgs": ["--sourcemap"],
       "env": {
-        "REMOTE_DEBUGGING_PORT": "http://127.0.0.1:9222"
-      }
+        "REMOTE_DEBUGGING_PORT": "9222"
+      },
     },
     {
       "name": "Debug Renderer Process",
@@ -36,9 +22,6 @@
       "type": "chrome",
       "webRoot": "${workspaceFolder}/src/renderer",
       "timeout": 60000,
-      "presentation": {
-        "hidden": true
-      }
     }
   ],
   "compounds": [

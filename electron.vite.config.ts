@@ -30,12 +30,20 @@ export default defineConfig({
     }
   },
   renderer: {
+    plugins: [vue()],
     resolve: {
       alias: {
-        '@renderer': resolve('src/renderer/src')
+        '@renderer': resolve('src/renderer/src'),
+        '@resources': resolve('resources')
       }
     },
-    plugins: [vue()],
+    build: {
+      rollupOptions: {
+        input: {
+          index: resolve(__dirname, 'src/renderer/index.html')
+        }
+      }
+    },
     css: {
       preprocessorOptions: {
         scss: {

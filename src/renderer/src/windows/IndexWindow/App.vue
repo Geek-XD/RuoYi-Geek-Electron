@@ -1,11 +1,15 @@
 <script setup lang="ts">
-import Versions from './components/Versions.vue'
+import Versions from '@renderer/components/Versions.vue'
+// import Logo from '@renderer/assets/electron.svg'
+import Icon from '@resources/icon.png'
 
-const ipcHandle = () => window.electron.ipcRenderer.send('ping')
+function ipcHandle() {
+  window.electron.ipcRenderer.send('ping')
+}
 </script>
 
 <template>
-  <img alt="logo" class="logo" src="./assets/electron.svg" />
+  <img alt="logo" class="logo" :src="Icon" />
   <div class="creator">Powered by electron-vite</div>
   <div class="text">
     Build an Electron app with

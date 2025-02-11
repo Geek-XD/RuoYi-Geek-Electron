@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/ban-types */
 import { Worker } from 'worker_threads';
 export default class WorkerRunner extends Worker {
     public messageHandle: { [key: string]: Function } = {}
@@ -10,9 +9,14 @@ export default class WorkerRunner extends Worker {
         })
     }
 
-    BIND = (fun: Function) => {
-        this.messageHandle[fun.name] = fun;
-    }
+    BIND = (_target: object, atta: string, sym: TypedPropertyDescriptor<(...args: any[]) => any>) => {
+        const originalMethod = sym.value;
+        if (typeof originalMethod === 'function') {
+            this.messageHandle[atta] = originalMethod;
+        } else {
+            throw new Error(`[worker]: Method "${atta}" is not a function`);
+        }
+    };
     bind(name: string): (targer: Function) => void
     bind(name: string, fun: Function): void
     bind(name: string, fun?: Function): ((targer: Function) => void) | void {
@@ -25,3 +29,4 @@ export default class WorkerRunner extends Worker {
         }
     }
 }
+
