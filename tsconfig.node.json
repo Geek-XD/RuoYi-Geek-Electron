@@ -4,6 +4,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "composite": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "types": ["electron-vite/node"],
     "paths": {
       "@main/*": [
