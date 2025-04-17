@@ -4,8 +4,8 @@ import icon from '@resources/icon.png?asset'
 import { shell } from 'electron'
 import { is } from '@electron-toolkit/utils'
 
-export default class IndexWindow extends BaseWindow {
-  static browserWindowOptions: Electron.BrowserWindowConstructorOptions = {
+class IndexWindow extends BaseWindow {
+  browserWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 900,
     height: 670,
     show: false,
@@ -22,7 +22,7 @@ export default class IndexWindow extends BaseWindow {
     }
   }
 
-  static onCreate(context: Electron.CrossProcessExports.BrowserWindow): void {
+  onCreate(context: Electron.CrossProcessExports.BrowserWindow): void {
     context.on('ready-to-show', () => {
       context.show()
     })
@@ -39,3 +39,5 @@ export default class IndexWindow extends BaseWindow {
     }
   }
 }
+
+export default new IndexWindow()

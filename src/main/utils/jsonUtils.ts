@@ -4,7 +4,7 @@ import fs from 'fs'
  * @param filePath JSON文件的路径
  * @returns 返回解析后的JSON对象
  */
-function JSONLoads(filePath: string) {
+export function JSONLoads(filePath: string) {
   const content = fs.readFileSync(filePath, 'utf8')
   return JSON.parse(content)
 }
@@ -13,9 +13,7 @@ function JSONLoads(filePath: string) {
  * @param filePath 文件路径，用于指定JSON数据的保存位置
  * @param data 要保存的数据，可以是任何可以被JSON序列化的JavaScript值
  */
-function JSONDumps<T>(filePath: string, data: T): void {
+export function JSONDumps<T>(filePath: string, data: T): void {
   const jsonString = JSON.stringify(data, null, 2)
   fs.writeFileSync(filePath, jsonString, 'utf8')
 }
-
-export { JSONLoads, JSONDumps }

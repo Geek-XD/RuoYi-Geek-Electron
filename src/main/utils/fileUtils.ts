@@ -3,10 +3,10 @@ import path from 'path'
 
 /**
  * 异步函数，用于获取指定路径下的文件和目录的总大小
- * @param inputPath {string} 需要计算大小的文件或目录路径
+ * @param {string} inputPath  需要计算大小的文件或目录路径
  * @returns {Promise<number>} 返回文件或目录的总大小
  */
-export async function getPathSize(inputPath: string) {
+export async function getPathSize(inputPath: string): Promise<number> {
   async function walkDir(currentPath: string) {
     let dirTotalSize = 0
     try {

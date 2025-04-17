@@ -2,6 +2,7 @@ import { resolve } from 'path'
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 import vue from '@vitejs/plugin-vue'
 
+// https://cn.electron-vite.org/config/
 export default defineConfig({
   main: {
     plugins: [externalizeDepsPlugin()],
