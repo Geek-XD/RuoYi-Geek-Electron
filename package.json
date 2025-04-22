@@ -31,7 +31,8 @@
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.0",
     "@electron-toolkit/utils": "^3.0.0",
-    "electron-updater": "^6.1.7"
+    "electron-updater": "^6.1.7",
+    "node-machine-id": "^1.1.12"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config": "^1.0.2",
@@ -46,8 +47,8 @@
     "electron-builder": "^24.13.3",
     "electron-vite": "^2.3.0",
     "prettier": "^3.3.2",
-    "typescript": "^5.5.2",
     "sass": "1.79.4",
+    "typescript": "^5.5.2",
     "vite": "^5.3.1",
     "vue": "^3.4.30",
     "vue-tsc": "^2.0.22"
