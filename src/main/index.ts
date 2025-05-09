@@ -1,13 +1,15 @@
 import { app, BrowserWindow, globalShortcut, ipcMain } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import IndexWindow from './window/IndexWindow'
+import RuoyiWindow from './window/RuoyiWindow'
 import icon from '@resources/icon.png?asset'
-import path from 'path'
+import * as path from 'path'
 import { autoUpdater } from 'electron-updater'
 
 /** 创建初始窗口 */
 function createWindow() {
   IndexWindow.getWindow()
+  RuoyiWindow.getWindow()
 }
 
 /** 检查是否需要更新 */

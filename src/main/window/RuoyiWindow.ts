@@ -4,11 +4,13 @@ import icon from '@resources/icon.png?asset'
 import { shell } from 'electron'
 import { is } from '@electron-toolkit/utils'
 
-class IndexWindow extends BaseWindow {
+class RuoyiWindow extends BaseWindow {
   browserWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 900,
     height: 670,
-    show: false,
+    minWidth: 900,
+    minHeight: 670,
+    show: true,
     autoHideMenuBar: true,
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
@@ -33,11 +35,11 @@ class IndexWindow extends BaseWindow {
     })
     if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
       context.webContents.openDevTools()
-      context.loadURL(process.env['ELECTRON_RENDERER_URL'])
+      context.loadURL("http://localhost")
     } else {
-      context.loadFile(path.join(__dirname, '../renderer/index.html'))
+      context.loadFile("http://localhost")
     }
   }
 }
 
-export default new IndexWindow()
+export default new RuoyiWindow()
