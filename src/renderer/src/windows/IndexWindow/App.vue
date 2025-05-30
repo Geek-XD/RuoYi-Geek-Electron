@@ -4,7 +4,7 @@ import Versions from '@renderer/components/Versions.vue'
 import Icon from '@resources/icon.png'
 
 function ipcHandle() {
-  window.electron.ipcRenderer.send('ping')
+  window.electron.ipcRenderer.send('ping',"测试")
 }
 </script>
 

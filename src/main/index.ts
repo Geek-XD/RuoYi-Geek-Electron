@@ -1,10 +1,11 @@
-import { app, BrowserWindow, globalShortcut, ipcMain } from 'electron'
+import { app, BrowserWindow, globalShortcut } from 'electron'
 import { electronApp, optimizer } from '@electron-toolkit/utils'
 import IndexWindow from './window/IndexWindow'
 import RuoyiWindow from './window/RuoyiWindow'
 import icon from '@resources/icon.png?asset'
 import * as path from 'path'
 import { autoUpdater } from 'electron-updater'
+import './controller/IndexController'
 
 /** 创建初始窗口 */
 function createWindow() {
@@ -29,7 +30,6 @@ app.whenReady().then(() => {
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
   })
-  ipcMain.on('ping', () => console.log('pong'))
 
   checkUpdate()
   createWindow()

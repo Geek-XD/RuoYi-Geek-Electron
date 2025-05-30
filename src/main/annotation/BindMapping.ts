@@ -9,18 +9,17 @@ function isConstructor(target: any): target is Constructor<any> {
 }
 
 function handleIpcMain(name: string, fun: IpcMainHandle, type: IpcType) {
+  console.log(`[ipcMain][${name}]:type "${type}" is defined`);
   if (type in ipcMain) ipcMain[type](name, fun)
   else throw new Error(`[ipcMain][${name}]:type "${type}" is not defined`)
 }
 function filterInstanceMethods(o: any) {
-  console.log("o==>", o);
-
   return Object.getOwnPropertyNames(o.prototype).filter(
     (prop) => typeof o.prototype[prop] === 'function' && prop !== 'constructor'
   )
 }
 
-type Annotation = (target: object, atta: string, sym: TypedPropertyDescriptor<IpcMainHandle>) => void
+type Annotation = (target: object, atta?: string, sym?: TypedPropertyDescriptor<IpcMainHandle>) => void
 
 function BindMapping(name: string): Annotation
 function BindMapping(name: string, type: IpcType): Annotation
@@ -32,8 +31,10 @@ function BindMapping(
 ): void | ((target: object, atta: string, sym: TypedPropertyDescriptor<IpcMainHandle>) => void) {
   if (typeof target === 'string') {
     const name = target
+    console.log("name:", name);
+    
     const type = typeof atta === 'string' ? atta as IpcType : 'handle'
-    return (target: any, _atta: any, sym: any) => {
+    return (target: any, _atta?: any, sym?: any) => {
       isConstructor(target)
         ? filterInstanceMethods(target).forEach((i) => handleIpcMain(name + i, target.prototype[i], type))
         : handleIpcMain(name, sym.value, type)

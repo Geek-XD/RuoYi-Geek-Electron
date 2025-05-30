@@ -32,7 +32,8 @@
     "@electron-toolkit/preload": "^3.0.2",
     "@electron-toolkit/utils": "^4.0.0",
     "electron-updater": "^6.6.2",
-    "node-machine-id": "^1.1.12"
+    "node-machine-id": "^1.1.12",
+    "winston": "^3.17.0"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config": "^2.1.0",
@@ -40,6 +41,7 @@
     "@electron-toolkit/tsconfig": "^1.0.1",
     "@rushstack/eslint-patch": "^1.11.0",
     "@types/node": "^22.15.17",
+    "@types/winston": "^2.4.4",
     "@vitejs/plugin-vue": "^5.2.3",
     "@vue/eslint-config-prettier": "^10.2.0",
     "@vue/eslint-config-typescript": "^14.5.0",
