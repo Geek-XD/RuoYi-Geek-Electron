@@ -1,4 +1,6 @@
 import winston, { Logger } from 'winston';
+import { isConstructor, filterInstanceMethods } from './base';
+import type { Constructor, ClassDecorator, MethodDecorator } from './base'
 
 // 日志级别类型
 type LogLevel = 'error' | 'warn' | 'info' | 'debug';
@@ -56,24 +58,6 @@ const createLogger = (): Logger => {
 
 // 全局 logger 实例
 const logger = createLogger();
-
-// 构造函数类型
-type Constructor<T> = new (...args: any[]) => T;
-
-function isConstructor(target: any): target is Constructor<any> {
-    return typeof target === 'function' && 'prototype' in target;
-}
-
-function filterInstanceMethods(o: any) {
-    return Object.getOwnPropertyNames(o.prototype).filter(
-        (prop) => typeof o.prototype[prop] === 'function' && prop !== 'constructor'
-    );
-}
-
-// 方法装饰器类型
-type MethodDecorator = (target: object, propertyKey: string, descriptor: PropertyDescriptor) => void;
-// 类装饰器类型
-type ClassDecorator<T extends Constructor<any>> = (target: T) => T | void;
 
 // Log 装饰器重载 - 支持带配置的类装饰器和方法装饰器
 function Log(options?: LogOptions): MethodDecorator & ClassDecorator<any>;

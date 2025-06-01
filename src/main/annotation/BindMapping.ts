@@ -1,27 +1,18 @@
 import { ipcMain, IpcMainInvokeEvent } from 'electron'
+import type { ClassDecorator, Constructor, MethodDecorator } from './base'
+import { isConstructor, filterInstanceMethods } from './base';
 
-// 构造函数
-type Constructor<T> = new (...args: any[]) => T
 type IpcType = 'on' | 'once' | 'handle' | 'handleOnce'
 type IpcMainHandle = (event: IpcMainInvokeEvent, ...args: any[]) => any
-function isConstructor(target: any): target is Constructor<any> {
-  return typeof target === 'function' && 'prototype' in target
-}
 
 function handleIpcMain(name: string, fun: IpcMainHandle, type: IpcType) {
   if (type in ipcMain) ipcMain[type](name, fun)
   else throw new Error(`[ipcMain][${name}]:type "${type}" is not defined`)
 }
-function filterInstanceMethods(o: any) {
-  return Object.getOwnPropertyNames(o.prototype).filter(
-    (prop) => typeof o.prototype[prop] === 'function' && prop !== 'constructor'
-  )
-}
 
-type Annotation = (target: object, atta?: string, sym?: TypedPropertyDescriptor<IpcMainHandle>) => void
-
-function BindMapping(name: string): Annotation
-function BindMapping(name: string, type: IpcType): Annotation
+function BindMapping(name: string): MethodDecorator & ClassDecorator<any>
+function BindMapping(name: string, type: IpcType): MethodDecorator & ClassDecorator<any>
+function BindMapping<T extends Constructor<any>>(target: T): void;
 function BindMapping(target: object, atta: string, sym: TypedPropertyDescriptor<IpcMainHandle>): void
 function BindMapping(
   target: string | object | IpcMainHandle,
@@ -30,7 +21,6 @@ function BindMapping(
 ): void | ((target: object, atta: string, sym: TypedPropertyDescriptor<IpcMainHandle>) => void) {
   if (typeof target === 'string') {
     const name = target
-    
     const type = typeof atta === 'string' ? atta as IpcType : 'handle'
     return (target: any, _atta?: any, sym?: any) => {
       isConstructor(target)
