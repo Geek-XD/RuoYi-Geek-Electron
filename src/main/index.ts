@@ -8,7 +8,7 @@ import { autoUpdater } from 'electron-updater'
 import './controller/IndexController'
 
 /** 创建初始窗口 */
-function createWindow() {
+async function createWindow() {
   IndexWindow.getWindow()
   RuoyiWindow.getWindow()
 }

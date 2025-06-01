@@ -9,7 +9,6 @@ function isConstructor(target: any): target is Constructor<any> {
 }
 
 function handleIpcMain(name: string, fun: IpcMainHandle, type: IpcType) {
-  console.log(`[ipcMain][${name}]:type "${type}" is defined`);
   if (type in ipcMain) ipcMain[type](name, fun)
   else throw new Error(`[ipcMain][${name}]:type "${type}" is not defined`)
 }
@@ -31,7 +30,6 @@ function BindMapping(
 ): void | ((target: object, atta: string, sym: TypedPropertyDescriptor<IpcMainHandle>) => void) {
   if (typeof target === 'string') {
     const name = target
-    console.log("name:", name);
     
     const type = typeof atta === 'string' ? atta as IpcType : 'handle'
     return (target: any, _atta?: any, sym?: any) => {

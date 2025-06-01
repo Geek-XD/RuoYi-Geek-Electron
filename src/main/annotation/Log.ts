@@ -131,7 +131,6 @@ function applyLogDecorator(
     descriptor: PropertyDescriptor,
     options: LogOptions
 ) {
-    console.log(target, propertyKey, descriptor, options);
     const originalMethod = descriptor.value;
     const className = isConstructor(target) ? target.name : target.constructor.name;
     const methodName = propertyKey;
