@@ -6,11 +6,17 @@ import icon from '@resources/icon.png?asset'
 import * as path from 'path'
 import { autoUpdater } from 'electron-updater'
 import './controller/IndexController'
+import { getPage, initialize } from './utils/puppeteerUtils'
 
 /** 创建初始窗口 */
 async function createWindow() {
+  await initialize()
   IndexWindow.getWindow()
   RuoyiWindow.getWindow()
+  setTimeout(async () => {
+    const p = await getPage(RuoyiWindow)
+    p?.goto('https://www.browserscan.net/zh')
+  }, 1000)
 }
 
 /** 检查是否需要更新 */
