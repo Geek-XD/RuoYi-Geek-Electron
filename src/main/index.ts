@@ -18,7 +18,7 @@ initialize().catch((err) => {
 async function createWindow() {
   IndexWindow.getWindow()   // 用来演示开发一体化工程
   RuoyiWindow.getWindow()   // 用来演示开发页面分离工程
-  PuppeteerWindow.getWindow() // 用来演示自动化工具工程
+  PuppeteerWindow.getWindow() // 用来演示自动化工具工程    
 }
 
 /** 检查是否需要更新 */

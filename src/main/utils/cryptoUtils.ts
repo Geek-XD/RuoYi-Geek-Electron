@@ -1,6 +1,7 @@
 import { machineIdSync } from 'node-machine-id'
 import crypto from 'crypto'
 import fs from 'fs'
+import { app } from 'electron'
 export function generateKeyPairSync() {
   // 生成 2048 位 RSA 密钥对
   const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
@@ -21,18 +22,27 @@ export function generateKeyPairSync() {
   fs.writeFileSync('private.key', privateKey)
 }
 
-export function encryptMachineId() {
-  const machineId = machineIdSync()
+const signaturePath = app.getPath('userData') + '/signature.txt'
+
+/**
+ * 私钥存在管理端，用于签名授权文件
+ * @returns
+ */
+export function encryptMachineId(machineId: string) {
   const buffer = Buffer.from(machineId)
-  const publicKey = fs.readFileSync('public.key')
-  const encryptedMachineId = crypto.publicEncrypt(publicKey, buffer).toString('base64')
+  const privateKey = fs.readFileSync('private.key', 'utf-8')
+  const encryptedMachineId = crypto.privateEncrypt(privateKey, buffer).toString('base64')
   return encryptedMachineId
 }
 
-export function decryptMachineId(encryptedMachineId: string) {
+/** 
+ * 公钥存在客户端，用于验签授权文件
+ */
+export function decryptMachineId() {
   const machineId = machineIdSync()
-  const buffer = Buffer.from(encryptedMachineId, 'base64')
-  const privateKey = fs.readFileSync('private.key')
-  const decryptedMachineId = crypto.privateDecrypt(privateKey, buffer).toString('utf-8')
+  const signature = fs.readFileSync(signaturePath, 'utf-8')
+  const buffer = Buffer.from(signature, 'base64')
+  const publicKey = fs.readFileSync('public.key', 'utf-8')
+  const decryptedMachineId = crypto.publicDecrypt(publicKey, buffer).toString('utf-8')
   return decryptedMachineId === machineId ? true : false
 }
