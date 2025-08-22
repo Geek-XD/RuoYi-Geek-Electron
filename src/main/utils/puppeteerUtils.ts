@@ -23,6 +23,7 @@ export async function getPage(window: BaseWindow) {
 }
 
 export async function initialize() {
+    if (browser) return
     const port = app.commandLine.getSwitchValue("remote-debugging-port");
     if (!port) await pie.initialize(app)
     browser = await pie.connect(app, (puppeteer as unknown as typeof Puppeteer))
@@ -32,9 +33,15 @@ export async function initialize() {
 async function waitForPageLoad(window: BrowserWindow): Promise<void> {
     const tempGuid = UUID.v4()
     try {
+        // 确保渲染进程页面已准备好（加载完成或至少 DOM 就绪），再注入标识
         if (window.webContents.getURL() === '') {
             await window.webContents.loadURL('about:blank')
         }
+        // 如果正在加载，等待 did-finish-load 事件；否则立即继续
+        await new Promise<void>((resolve) => {
+            if (!window.webContents.isLoading()) return resolve()
+            window.webContents.once('did-finish-load', () => resolve())
+        })
         await window.webContents.executeJavaScript(`window.tempPuppeteerId = "${tempGuid}"`)
         await getBrowser().waitForTarget(
             async (target) => {

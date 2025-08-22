@@ -4,8 +4,9 @@ import icon from '@resources/icon.png?asset'
 import { shell } from 'electron'
 import { is } from '@electron-toolkit/utils'
 import { readVersion } from '@main/utils/common'
+import { getPage } from '@main/utils/puppeteerUtils'
 
-class RuoyiWindow extends BaseWindow {
+class PuppeteerWindow extends BaseWindow {
   browserWindowOptions: Electron.BrowserWindowConstructorOptions = {
     width: 900,
     height: 670,
@@ -26,6 +27,12 @@ class RuoyiWindow extends BaseWindow {
   }
 
   async onCreate(context: Electron.CrossProcessExports.BrowserWindow) {
+    try {
+      const version = await readVersion()
+      context.webContents.setUserAgent(`Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ${version["Browser"]} Safari/537.36`)
+      console.log(`User-Agent: ${context.webContents.getUserAgent()}`);
+    } catch (e) {
+    }
     context.on('ready-to-show', () => {
       context.show()
     })
@@ -36,11 +43,23 @@ class RuoyiWindow extends BaseWindow {
       return { action: 'deny' }
     })
     if (is.dev) {
-      context.loadURL("http://localhost")
+      // context.webContents.openDevTools()
+      console.log(`Renderer URL: ${"https://www.browserscan.net/zh"}`);
+      context.loadURL("https://www.browserscan.net/zh/bot-detection")
     } else {
       context.loadFile("http://localhost")
     }
+
+    context.webContents.once('did-finish-load', async () => {
+      try {
+        const p = await getPage(this)
+        await p?.goto('https://www.browserscan.net/zh')
+      } catch (err) {
+        // eslint-disable-next-line no-console
+        console.error('导航 Puppeteer 页面失败:', err)
+      }
+    })
   }
 }
 
-export default new RuoyiWindow()
+export default new PuppeteerWindow()

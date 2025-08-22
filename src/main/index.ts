@@ -6,17 +6,19 @@ import icon from '@resources/icon.png?asset'
 import * as path from 'path'
 import { autoUpdater } from 'electron-updater'
 import './controller/IndexController'
-import { getPage, initialize } from './utils/puppeteerUtils'
+import PuppeteerWindow from './window/PuppeteerWindow'
+
+// 如果不需要使用puppeteer，请删除初始化puppeteer的代码
+import { initialize } from './utils/puppeteerUtils'
+initialize().catch((err) => {
+  console.error('puppeteer-in-electron initialize failed:', err)
+})
 
 /** 创建初始窗口 */
 async function createWindow() {
-  await initialize()
-  IndexWindow.getWindow()
-  RuoyiWindow.getWindow()
-  setTimeout(async () => {
-    const p = await getPage(RuoyiWindow)
-    p?.goto('https://www.browserscan.net/zh')
-  }, 1000)
+  IndexWindow.getWindow()   // 用来演示开发一体化工程
+  RuoyiWindow.getWindow()   // 用来演示开发页面分离工程
+  PuppeteerWindow.getWindow() // 用来演示自动化工具工程
 }
 
 /** 检查是否需要更新 */
@@ -38,7 +40,9 @@ app.whenReady().then(() => {
   })
 
   checkUpdate()
-  createWindow()
+  createWindow().catch((err) => {
+    console.error('createWindow failed:', err)
+  })
 
   app.on('activate', function () {
     if (BrowserWindow.getAllWindows().length === 0) {
