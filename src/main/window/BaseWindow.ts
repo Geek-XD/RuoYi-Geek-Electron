@@ -1,10 +1,16 @@
+import { Constructor } from '@main/annotation/base'
 import { BrowserWindow } from 'electron'
 
-export default abstract class BaseWindow {
+export default class BaseWindow {
   public browserWindow: BrowserWindow | null = null
-  abstract browserWindowOptions: Electron.BrowserWindowConstructorOptions
+  public browserWindowOptions: Electron.BrowserWindowConstructorOptions = {}
+  public userData: { [key: string]: any } = {}
 
-  protected onCreate(_context: BrowserWindow) {}
+  constructor(options?: Electron.BrowserWindowConstructorOptions) {
+    Object.assign(this.browserWindowOptions, options)
+  }
+
+  public onCreate(_context: BrowserWindow) { }
 
   public getWindow(): BrowserWindow {
     if (!this.browserWindow) {
@@ -23,3 +29,52 @@ export default abstract class BaseWindow {
     }
   }
 }
+type HookFun<T extends BaseWindow> = (content: Electron.CrossProcessExports.BrowserWindow, userData: T['userData'], window: T) => void | Promise<void>
+type Hook<T extends BaseWindow> = {
+  type: 'sync' | 'async',
+  fun: HookFun<T>
+}
+export class WindowBuilder<T extends BaseWindow> {
+  private browserWindowOptions: Electron.BrowserWindowConstructorOptions = {}
+  private webPreferences: Electron.WebPreferences = {}
+  private hooks: Hook<T>[] = []
+  constructor(
+    private constructorer: Constructor<T> = BaseWindow as Constructor<T>
+  ) {
+    this.browserWindowOptions.webPreferences = this.webPreferences
+  }
+
+  setWebPreferences(options: Electron.WebPreferences): WindowBuilder<T> {
+    Object.assign(this.webPreferences, options)
+    return this
+  }
+
+  setBrowserWindowOptions(options: Electron.BrowserWindowConstructorOptions): WindowBuilder<T> {
+    Object.assign(this.browserWindowOptions, options)
+    return this
+  }
+
+  hook(hook: HookFun<T>): WindowBuilder<T> {
+    this.hooks.push({ type: 'sync', fun: hook })
+    return this
+  }
+
+  asyncHook(hook: HookFun<T>): WindowBuilder<T> {
+    this.hooks.push({ type: 'async', fun: hook })
+    return this
+  }
+
+  async build(): Promise<T> {
+    const window = new this.constructorer(this.browserWindowOptions)
+    const bw = window.getWindow()
+    for (const hook of this.hooks) {
+      if (hook.type === 'sync') {
+        hook.fun(bw, window.userData, window)
+      } else {
+        await hook.fun(bw, window.userData, window)
+      }
+    }
+    return window
+  }
+}
+

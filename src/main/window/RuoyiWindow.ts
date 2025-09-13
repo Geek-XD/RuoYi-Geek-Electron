@@ -1,9 +1,7 @@
 import BaseWindow from './BaseWindow'
 import path from 'path'
 import icon from '@resources/icon.png?asset'
-import { shell } from 'electron'
 import { is } from '@electron-toolkit/utils'
-import { readVersion } from '@main/utils/common'
 
 class RuoyiWindow extends BaseWindow {
   browserWindowOptions: Electron.BrowserWindowConstructorOptions = {

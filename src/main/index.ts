@@ -1,24 +1,33 @@
 import { app, BrowserWindow, globalShortcut } from 'electron'
-import { electronApp, optimizer } from '@electron-toolkit/utils'
+import { electronApp, is, optimizer } from '@electron-toolkit/utils'
 import IndexWindow from './window/IndexWindow'
 import RuoyiWindow from './window/RuoyiWindow'
 import icon from '@resources/icon.png?asset'
 import * as path from 'path'
 import { autoUpdater } from 'electron-updater'
 import './controller/IndexController'
-import PuppeteerWindow from './window/PuppeteerWindow'
 
 // 如果不需要使用puppeteer，请删除初始化puppeteer的代码
 import { initialize } from './utils/puppeteerUtils'
+import { WindowBuilder } from './window/BaseWindow'
+import { hookLoadUrl, hookReadyToShow, hookSetUserAgent } from './window/Hooks'
 initialize().catch((err) => {
   console.error('puppeteer-in-electron initialize failed:', err)
 })
-
 /** 创建初始窗口 */
 async function createWindow() {
-  IndexWindow.getWindow()   // 用来演示开发一体化工程
-  RuoyiWindow.getWindow()   // 用来演示开发页面分离工程
-  PuppeteerWindow.getWindow() // 用来演示自动化工具工程    
+  // 用来演示开发一体化工程,通过创建对象的方式创建窗口
+  const index = new IndexWindow().getWindow()
+  hookReadyToShow(index)
+  // 用来演示开发页面分离工程，通过唯一实例获取窗口
+  RuoyiWindow.getWindow()
+  // 用来演示自动化工具工程，通过构建器构建窗口
+  new WindowBuilder()
+    .asyncHook(hookSetUserAgent)
+    .hook(hookLoadUrl('deny'))
+    .hook(context => context.loadURL("https://www.browserscan.net/zh/bot-detection"))
+    .hook(hookReadyToShow)
+    .build()
 }
 
 /** 检查是否需要更新 */

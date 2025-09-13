@@ -40,4 +40,4 @@ class IndexWindow extends BaseWindow {
   }
 }
 
-export default new IndexWindow()
+export default IndexWindow
