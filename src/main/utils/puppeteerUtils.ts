@@ -32,36 +32,47 @@ export async function initialize() {
 
 async function waitForPageLoad(window: BrowserWindow): Promise<void> {
     const tempGuid = UUID.v4()
+    // 记录一些调试信息
     try {
-        // 确保渲染进程页面已准备好（加载完成或至少 DOM 就绪），再注入标识
-        if (window.webContents.getURL() === '') {
-            await window.webContents.loadURL('about:blank')
+        if (window.isDestroyed()) return
+        const url = window.webContents.getURL()
+        // 仅在空 URL 且未开始加载时考虑 about:blank（多数情况下主流程会自行 loadURL，不强制插入）
+        if (!url) {
+            // 不立即加载 about:blank，避免打断外部 loadURL 逻辑
         }
-        // 如果正在加载，等待 did-finish-load 事件；否则立即继续
-        await new Promise<void>((resolve) => {
-            if (!window.webContents.isLoading()) return resolve()
-            window.webContents.once('did-finish-load', () => resolve())
-        })
-        await window.webContents.executeJavaScript(`window.tempPuppeteerId = "${tempGuid}"`)
-        await getBrowser().waitForTarget(
-            async (target) => {
-                if (target.type() !== 'page') return false
-                try {
-                    const page = await target.page()
-                    if (!page) return false
-                    return (await page.evaluate('window.tempPuppeteerId')) === tempGuid
-                } catch (e) {
-                    return false
-                }
-            },
-            { timeout: 5000 }
-        )
-    } catch (error: any) {
-        window.destroy()
-        throw new Error('等待 Puppeteer 目标超时，无法找到新窗口。')
+        if (window.webContents.isLoading()) {
+            await new Promise<void>((resolve) => {
+                window.webContents.once('did-finish-load', () => resolve())
+                // 兜底 8s 超时
+                setTimeout(() => resolve(), 8000)
+            })
+        }
+        if (window.isDestroyed()) return
+        await window.webContents.executeJavaScript(`window.tempPuppeteerId = "${tempGuid}"`).catch(()=>{})
+        const matched = await Promise.race([
+            getBrowser().waitForTarget(
+                async (target) => {
+                    if (target.type() !== 'page') return false
+                    try {
+                        const page = await target.page()
+                        if (!page) return false
+                        return (await page.evaluate('window.tempPuppeteerId')) === tempGuid
+                    } catch {
+                        return false
+                    }
+                },
+                { timeout: 5000 }
+            ).then(()=>true).catch(()=>false),
+            new Promise<boolean>(resolve=>setTimeout(()=>resolve(false), 6000))
+        ])
+        if (!matched) {
+            console.warn('[waitForPageLoad] 未匹配到目标 page（可能是初次加载过快或二次导航），继续后续流程。')
+        }
+    } catch (error) {
+        console.warn('[waitForPageLoad] 捕获异常，不销毁窗口，继续后续：', error)
     } finally {
         if (!window.isDestroyed()) {
-            await window.webContents.executeJavaScript('delete window.tempPuppeteerId')
+            window.webContents.executeJavaScript('delete window.tempPuppeteerId').catch(()=>{})
         }
     }
 }
